@@ -8,10 +8,8 @@
 import Foundation
 
 
-extension TargetType {
+public protocol Cacheable {
     
-    var cache: CacheType {
-        return .never
-    }
+    var cache: CacheType { get }
     
 }

@@ -3,9 +3,6 @@ import RxSwift
 #if !COCOAPODS
 import Moya
 #endif
-#if USE_CACHE
-import AwesomeCache
-#endif
 
 extension MoyaProvider: ReactiveCompatible {}
 
@@ -29,7 +26,6 @@ public extension Reactive where Base: MoyaProviderType {
 
 internal extension MoyaProviderType {
     
-    #if USE_CACHE
 
     internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
         return Single.create { [weak self] single in
@@ -47,50 +43,6 @@ internal extension MoyaProviderType {
             }
         }
     }
-    
-    #else
-
-    internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
-        let cache: Cache<CacheSink> = try! Cache<CacheSink>(name: "moyaCache")
-        let key = token.baseURL.appendingPathComponent(token.path).absoluteString
-        if let sink = cache[key], sink.expires > Date().timeIntervalSince1970 || sink.expires == 0 {
-            return Single.create { [weak self] single in
-                single(.success(sink.response))
-                
-                return Disposables.create {
-                }
-            }
-        }else {
-            return Single.create { [weak self] single in
-                let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
-                    switch result {
-                    case let .success(response):
-                        switch token.cache {
-                        case .never:
-                            break
-                        case .memory:
-                            cache[key] = CacheSink(expires: Date().timeIntervalSince1970 + 600, response: response)
-                        case .disk(let seconed):
-                            cache[key] = CacheSink(expires: Date().timeIntervalSince1970 + Double(seconed), response: response)
-                        case .forever:
-                            cache[key] = CacheSink(expires: 0, response: response)
-                        }
-                        single(.success(response))
-                    case let .failure(error):
-                        single(.error(error))
-                    }
-                }
-                
-                return Disposables.create {
-                    cancellableToken?.cancel()
-                }
-            }
-        }
-        
-    }
-    
-    #endif
-    
 
     internal func rxRequestWithProgress(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Observable<ProgressResponse> {
         let progressBlock: (AnyObserver) -> (ProgressResponse) -> Void = { observer in

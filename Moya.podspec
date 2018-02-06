@@ -45,6 +45,10 @@ Pod::Spec.new do |s|
     ss.dependency "Moya/Core"
     ss.dependency "RxSwift", "~> 4.0"
     ss.dependency "AwesomeCache"
+    ss.pod_target_xcconfig = {
+      'OTHER_SWIFT_FLAGS' => '-D USE_CACHE',
+      'GCC_PREPROCESSOR_DEFINITIONS' => 'USE_CACHE=1'
+    }
   end
 
 end

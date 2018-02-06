@@ -5,13 +5,13 @@ public final class Response: CustomDebugStringConvertible, Equatable {
 
     /// The status code of the response.
     public let statusCode: Int
-
+    
     /// The response data.
     public let data: Data
-
+    
     /// The original URLRequest for the response.
     public let request: URLRequest?
-
+    
     /// The HTTPURLResponse object.
     public let response: HTTPURLResponse?
 
