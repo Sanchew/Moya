@@ -11,7 +11,10 @@ import Foundation
 extension TargetType {
 
     var cacheKey: String {
-        return self.baseURL.appendingPathComponent(self.path).absoluteString
+        let endpoint = MoyaProvider.defaultEndpointMapping(for: self)
+        let request = try! endpoint.urlRequest()
+        let origin = NSKeyedArchiver.archivedData(withRootObject: request).base64EncodedString()
+        return origin
     }
     
 }

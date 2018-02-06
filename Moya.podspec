@@ -40,11 +40,10 @@ Pod::Spec.new do |s|
   end
 
   s.subspec "Cache" do |ss|
-    # ss.prefix_header_contents = "#define USE_CACHE 1"
     ss.source_files = "Sources/Cache/"
     ss.dependency "Moya/Core"
     ss.dependency "RxSwift", "~> 4.0"
-    ss.dependency "AwesomeCache"
+    ss.dependency "Cache"
     ss.pod_target_xcconfig = {
       'OTHER_SWIFT_FLAGS' => '-D USE_CACHE',
       'GCC_PREPROCESSOR_DEFINITIONS' => 'USE_CACHE=1'

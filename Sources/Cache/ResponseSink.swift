@@ -6,11 +6,8 @@
 //
 
 import UIKit
-#if !COCOAPODS
-    import Moya
-#endif
 
-internal class ResponseSink: NSObject, NSCoding {
+internal class ResponseSink: NSObject, NSCoding, Codable {
     func encode(with aCoder: NSCoder) {
         aCoder.encode(_statusCode, forKey: "statusCode")
         aCoder.encode(_data, forKey: "data")
@@ -36,6 +33,7 @@ internal class ResponseSink: NSObject, NSCoding {
     
     /// The HTTPURLResponse object.
     private let _response: HTTPURLResponse?
+    
 
     init(_ response: Response) {
         _statusCode = response.statusCode
@@ -47,6 +45,33 @@ internal class ResponseSink: NSObject, NSCoding {
     var response: Response {
         return Response(statusCode: _statusCode, data: _data, request: _request, response: _response)
     }
+
+    private enum CodingKeys:String, CodingKey {
+        case _statusCode, _data, _request, _response
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(_statusCode, forKey: ._statusCode)
+        try container.encode(_data, forKey: ._data)
+        let _requestData = NSKeyedArchiver.archivedData(withRootObject: _request)
+        try container.encode(_requestData, forKey: ._request)
+        let _responseData = NSKeyedArchiver.archivedData(withRootObject: _response)
+        try container.encode(_responseData, forKey: ._response)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        _statusCode = try container.decode(Int.self, forKey: ._statusCode)
+        _data = try container.decode(Data.self, forKey: ._data)
+        let _requestData = try container.decode(Data.self, forKey: ._request)
+        _request = NSKeyedUnarchiver.unarchiveObject(with: _requestData) as? URLRequest
+        let _responseData = try container.decode(Data.self, forKey: ._response)
+        _response = NSKeyedUnarchiver.unarchiveObject(with: _responseData) as? HTTPURLResponse
+        super.init()
+    }
+    
     
 }
+
 
