@@ -38,4 +38,13 @@ Pod::Spec.new do |s|
     ss.dependency "Moya/Core"
     ss.dependency "RxSwift", "~> 4.0"
   end
+
+  s.subspec "Cache" do |ss|
+    # ss.prefix_header_contents = "#define USE_CACHE 1"
+    ss.source_files = "Sources/Cache/"
+    ss.dependency "Moya/Core"
+    ss.dependency "RxSwift", "~> 4.0"
+    ss.dependency "AwesomeCache"
+  end
+
 end
