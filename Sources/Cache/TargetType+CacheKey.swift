@@ -14,7 +14,7 @@ extension TargetType {
         let endpoint = MoyaProvider.defaultEndpointMapping(for: self)
         let request = try! endpoint.urlRequest()
         let origin = NSKeyedArchiver.archivedData(withRootObject: request).base64EncodedString()
-        return "\(origin.hashValue)"
+        return origin
     }
     
 }

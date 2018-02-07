@@ -1,6 +1,8 @@
 import Foundation
 import Result
-
+#if USE_CACHE
+    import AwesomeCache
+#endif
 
 /// Closure to be executed when a request has completed.
 public typealias Completion = (_ result: Result<Moya.Response, MoyaError>) -> Void
@@ -10,24 +12,24 @@ public typealias ProgressBlock = (_ progress: ProgressResponse) -> Void
 
 /// A type representing the progress of a request.
 public struct ProgressResponse {
-
+    
     /// The optional response of the request.
     public let response: Response?
-
+    
     /// An object that conveys ongoing progress for a given request.
     public let progressObject: Progress?
-
+    
     /// Initializes a `ProgressResponse`.
     public init(progress: Progress? = nil, response: Response? = nil) {
         self.progressObject = progress
         self.response = response
     }
-
+    
     /// The fraction of the overall work completed by the progress object.
     public var progress: Double {
         return progressObject?.fractionCompleted ?? 1.0
     }
-
+    
     /// A Boolean value stating whether the request is completed.
     public var completed: Bool {
         return progress == 1.0 && response != nil
@@ -37,52 +39,52 @@ public struct ProgressResponse {
 /// A protocol representing a minimal interface for a MoyaProvider.
 /// Used by the reactive provider extensions.
 public protocol MoyaProviderType: AnyObject {
-
+    
     associatedtype Target: TargetType
-
+    
     /// Designated request-making method. Returns a `Cancellable` token to cancel the request later.
     func request(_ target: Target, callbackQueue: DispatchQueue?, progress: Moya.ProgressBlock?, completion: @escaping Moya.Completion) -> Cancellable
 }
 
 /// Request provider class. Requests should be made through this class only.
 open class MoyaProvider<Target: TargetType>: MoyaProviderType {
-
+    
     /// Closure that defines the endpoints for the provider.
     public typealias EndpointClosure = (Target) -> Endpoint<Target>
-
+    
     /// Closure that decides if and what request should be performed.
     public typealias RequestResultClosure = (Result<URLRequest, MoyaError>) -> Void
-
+    
     /// Closure that resolves an `Endpoint` into a `RequestResult`.
     public typealias RequestClosure = (Endpoint<Target>, @escaping RequestResultClosure) -> Void
-
+    
     /// Closure that decides if/how a request should be stubbed.
     public typealias StubClosure = (Target) -> Moya.StubBehavior
-
+    
     /// A closure responsible for mapping a `TargetType` to an `EndPoint`.
     open let endpointClosure: EndpointClosure
-
+    
     /// A closure deciding if and what request should be performed.
     open let requestClosure: RequestClosure
-
+    
     /// A closure responsible for determining the stubbing behavior
     /// of a request for a given `TargetType`.
     open let stubClosure: StubClosure
-
+    
     /// The manager for the session.
     open let manager: Manager
-
+    
     /// A list of plugins.
     /// e.g. for logging, network activity indicator or credentials.
     open let plugins: [PluginType]
-
+    
     open let trackInflights: Bool
-
+    
     open internal(set) var inflightRequests: [Endpoint<Target>: [Moya.Completion]] = [:]
-
+    
     /// Propagated to Alamofire as callback queue. If nil - the Alamofire default (as of their API in 2017 - the main queue) will be used.
     let callbackQueue: DispatchQueue?
-
+    
     /// Initializes a provider.
     public init(endpointClosure: @escaping EndpointClosure = MoyaProvider.defaultEndpointMapping,
                 requestClosure: @escaping RequestClosure = MoyaProvider.defaultRequestMapping,
@@ -91,7 +93,7 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
                 manager: Manager = MoyaProvider<Target>.defaultAlamofireManager(),
                 plugins: [PluginType] = [],
                 trackInflights: Bool = false) {
-
+        
         self.endpointClosure = endpointClosure
         self.requestClosure = requestClosure
         self.stubClosure = stubClosure
@@ -100,24 +102,58 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
         self.trackInflights = trackInflights
         self.callbackQueue = callbackQueue
     }
-
+    
     /// Returns an `Endpoint` based on the token, method, and parameters by invoking the `endpointClosure`.
     open func endpoint(_ token: Target) -> Endpoint<Target> {
         return endpointClosure(token)
     }
-
     
+    
+    #if !USE_CACHE
     /// Designated request-making method. Returns a `Cancellable` token to cancel the request later.
+    @discardableResult
+    open func request(_ target: Target,
+    callbackQueue: DispatchQueue? = .none,
+    progress: ProgressBlock? = .none,
+    completion: @escaping Completion) -> Cancellable {
+    
+    let callbackQueue = callbackQueue ?? self.callbackQueue
+    return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: completion)
+    }
+    #else
     @discardableResult
     open func request(_ target: Target,
                       callbackQueue: DispatchQueue? = .none,
                       progress: ProgressBlock? = .none,
                       completion: @escaping Completion) -> Cancellable {
 
-        let callbackQueue = callbackQueue ?? self.callbackQueue
-        return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: completion)
+        let key = target.cacheKey
+        
+        if let response = storage[key] {
+            completion(.init(value: response.response))
+            return CancellableWrapper()
+        }else {
+            let callbackQueue = callbackQueue ?? self.callbackQueue
+            return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: { result in
+                if case let .success(response) = result, let target = target as? Cacheable {
+                    switch target.cache {
+                    case .never:
+                        break
+                    case .memory:
+//                        storage.setObject(ResponseSink(response), forKey: key, expires: .seconds(600))
+                        break
+                    case .disk(let seconed):
+                        storage.setObject(ResponseSink(response), forKey: key, expires: .seconds(TimeInterval(seconed)))
+                    case .forever:
+                        storage.setObject(ResponseSink(response), forKey: key, expires: .never)
+                    }
+                }
+                completion(result)
+            })
+        }
     }
     
+    #endif
     // swiftlint:disable function_parameter_count
     /// When overriding this method, take care to `notifyPluginsOfImpendingStub` and to perform the stub using the `createStubFunction` method.
     /// Note: this was previously in an extension, however it must be in the original class declaration to allow subclasses to override.
@@ -145,7 +181,7 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
         case .never:
             fatalError("Method called to stub request when stubbing is disabled.")
         }
-
+        
         return cancellableToken
     }
     // swiftlint:enable function_parameter_count
@@ -155,32 +191,32 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
 
 /// Controls how stub responses are returned.
 public enum StubBehavior {
-
+    
     /// Do not stub.
     case never
-
+    
     /// Return a response immediately.
     case immediate
-
+    
     /// Return a response after a delay.
     case delayed(seconds: TimeInterval)
 }
 
 public extension MoyaProvider {
-
+    
     // Swift won't let us put the StubBehavior enum inside the provider class, so we'll
     // at least add some class functions to allow easy access to common stubbing closures.
-
+    
     /// Do not stub.
     public final class func neverStub(_: Target) -> Moya.StubBehavior {
         return .never
     }
-
+    
     /// Return a response immediately.
     public final class func immediatelyStub(_: Target) -> Moya.StubBehavior {
         return .immediate
     }
-
+    
     /// Return a response after a delay.
     public final class func delayedStub(_ seconds: TimeInterval) -> (Target) -> Moya.StubBehavior {
         return { _ in return .delayed(seconds: seconds) }
@@ -206,3 +242,4 @@ public func convertResponseToResult(_ response: HTTPURLResponse?, request: URLRe
             return .failure(error)
         }
 }
+
