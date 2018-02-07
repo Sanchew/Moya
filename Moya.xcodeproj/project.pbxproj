@@ -82,7 +82,7 @@
 		D00AA2514CD6B1276B845BA7 /* ReactiveMoya.h in Headers */ = {isa = PBXBuildFile; fileRef = 019BF5A88BB928EBDFD944FE /* ReactiveMoya.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D6A04B657A83CA2FF80ABCF4 /* Moya.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 559D567FD0DA37D6CC98FF92 /* Moya.framework */; };
 		DA5049A820297C3700844AAC /* Cacheable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A720297C3600844AAC /* Cacheable.swift */; };
-		DA5049AA20297CB200844AAC /* TargetType+CacheKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A920297CB200844AAC /* TargetType+CacheKey.swift */; };
+		DA540912202AFD120068A90C /* TargetType+Cacheable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA540911202AFD120068A90C /* TargetType+Cacheable.swift */; };
 		DA631A5B37F36DA17E135F14 /* SignalProducer+MoyaSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFAFEA29CDFABC559F0BE2 /* SignalProducer+MoyaSpec.swift */; };
 		DA9A6DA12027EF8C005411F3 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9A6DA02027EF8C005411F3 /* Cache.swift */; };
 		DA9A6DA920280A7E005411F3 /* RxMoya.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A53DF8B33D58E052A78E2BA /* RxMoya.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -220,7 +220,7 @@
 		D38525FE207BE148B17084F3 /* Moya.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Moya.h; sourceTree = "<group>"; };
 		D48555FB39336D99F8365F5E /* MoyaProvider+Rx.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Rx.swift"; sourceTree = "<group>"; };
 		DA5049A720297C3600844AAC /* Cacheable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cacheable.swift; sourceTree = "<group>"; };
-		DA5049A920297CB200844AAC /* TargetType+CacheKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetType+CacheKey.swift"; sourceTree = "<group>"; };
+		DA540911202AFD120068A90C /* TargetType+Cacheable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetType+Cacheable.swift"; sourceTree = "<group>"; };
 		DA9A6DA02027EF8C005411F3 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DA9A6DB420280A7E005411F3 /* Cache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Cache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA9A6DB520280A7E005411F3 /* RxMoya copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "RxMoya copy-Info.plist"; path = "/Users/lee/Developer/Example/Moya/RxMoya copy-Info.plist"; sourceTree = "<absolute>"; };
@@ -476,7 +476,7 @@
 				DAE99E8F202ABEAC00B41686 /* ResponseSink.swift */,
 				DA5049A720297C3600844AAC /* Cacheable.swift */,
 				DA9A6DA02027EF8C005411F3 /* Cache.swift */,
-				DA5049A920297CB200844AAC /* TargetType+CacheKey.swift */,
+				DA540911202AFD120068A90C /* TargetType+Cacheable.swift */,
 			);
 			path = Cache;
 			sourceTree = "<group>";
@@ -927,7 +927,6 @@
 				61633F6E85FB39A4707A6167 /* MultipartFormData.swift in Sources */,
 				5054F87AFF61EAC0097F88BD /* MultiTarget.swift in Sources */,
 				BEAA605B30BE7651BA5C61A4 /* Plugin.swift in Sources */,
-				DA5049AA20297CB200844AAC /* TargetType+CacheKey.swift in Sources */,
 				83B0E400A7562256224CB7FF /* AccessTokenPlugin.swift in Sources */,
 				B5A7124CF285D8EC7F89C1AD /* CredentialsPlugin.swift in Sources */,
 				1446FBB31F214C5200C1EFF2 /* URL+Moya.swift in Sources */,
@@ -936,6 +935,7 @@
 				1FD44D9E21CEA6B6221807EF /* NetworkLoggerPlugin.swift in Sources */,
 				A8C55515DFA147BE4159B40A /* Response.swift in Sources */,
 				A2B64B2383FB0BC3C17B3160 /* TargetType.swift in Sources */,
+				DA540912202AFD120068A90C /* TargetType+Cacheable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

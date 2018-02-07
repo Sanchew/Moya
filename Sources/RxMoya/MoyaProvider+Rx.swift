@@ -14,9 +14,15 @@ public extension Reactive where Base: MoyaProviderType {
     ///   - token: Entity, which provides specifications necessary for a `MoyaProvider`.
     ///   - callbackQueue: Callback queue. If nil - queue from provider initializer will be used.
     /// - Returns: Single response object.
+    #if !USE_CACHE
     public func request(_ token: Base.Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
+    return base.rxRequest(token, callbackQueue: callbackQueue)
+    }
+    #else
+    public func request(_ token: Base.Target, callbackQueue: DispatchQueue? = nil) -> Observable<Response> {
         return base.rxRequest(token, callbackQueue: callbackQueue)
     }
+    #endif
 
     /// Designated request-making method with progress.
     public func requestWithProgress(_ token: Base.Target, callbackQueue: DispatchQueue? = nil) -> Observable<ProgressResponse> {
@@ -26,7 +32,7 @@ public extension Reactive where Base: MoyaProviderType {
 
 internal extension MoyaProviderType {
     
-
+    #if !USE_CACHE
     internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
         return Single.create { [weak self] single in
             let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
@@ -43,6 +49,37 @@ internal extension MoyaProviderType {
             }
         }
     }
+    #else
+    internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Observable<Response> {
+        return Observable<Response>.create { [weak self] observer in
+//            if let cache = token.cache {
+//                print("cache in mem: \(storage.isOnMemory(forKey: cache.cacheKey)) \(cache.cacheKey.hashValue) \(try! MoyaProvider.defaultEndpointMapping(for: token).urlRequest())")
+                if let cache = token.cache, let response = storage[cache.cacheKey] {
+                    print("after cache in mem: \(storage.isOnMemory(forKey: cache.cacheKey)) \(try! MoyaProvider.defaultEndpointMapping(for: token).urlRequest())")
+                    observer.onNext(response.response)
+                    observer.onCompleted()
+                    return Disposables.create {
+
+                    }
+                }
+//            }
+            let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
+                switch result {
+                case let .success(response):
+                    observer.onNext(response)
+                    token.cache?.save(response)
+                    observer.onCompleted()
+                case let .failure(error):
+                    observer.onError(error)
+                }
+            }
+            
+            return Disposables.create {
+                cancellableToken?.cancel()
+            }
+        }
+    }
+    #endif
     
 
     internal func rxRequestWithProgress(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Observable<ProgressResponse> {
