@@ -11,6 +11,6 @@ public enum CacheType {
     public static let `default`: CacheType = .never
     case never
     case memory
-    case disk(seconed: Int)
+    case disk(seconds: Int)
     case forever
 }
