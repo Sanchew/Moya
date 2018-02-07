@@ -152,51 +152,6 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
             })
         }
     }
-//    internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
-//        let cache: Cache<ResponseSink> = try! Cache<ResponseSink>(name: "moyaCache")
-//
-//        let key = token.cacheKey
-//
-//        if let response = cache[key] {
-//            return Single.create { [weak self] single in
-//                single(.success(response.response))
-//
-//                return Disposables.create {
-//                }
-//            }
-//        }else {
-//            return Single.create { [weak self] single in
-//                let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
-//                    switch result {
-//                    case let .success(response):
-//                        if let token = token as? Cacheable {
-//                            switch token.cache {
-//                            case .never:
-//                                break
-//                            case .memory:
-//                                //                        cache[key] = CacheSink(expires: Date().timeIntervalSince1970 + 600, response: response)
-//                                cache.setObject(ResponseSink(response), forKey: key, expires: .seconds(600))
-//                            case .disk(let seconed):
-//                                //                        cache[key] = CacheSink(expires: Date().timeIntervalSince1970 + Double(seconed), response: response)
-//                                cache.setObject(ResponseSink(response), forKey: key, expires: .seconds(TimeInterval(seconed)))
-//                            case .forever:
-//                                //                        cache[key] = CacheSink(expires: 0, response: response)
-//                                cache.setObject(ResponseSink(response), forKey: key, expires: .never)
-//                            }
-//                        }
-//                        single(.success(response))
-//                    case let .failure(error):
-//                        single(.error(error))
-//                    }
-//                }
-//
-//                return Disposables.create {
-//                    cancellableToken?.cancel()
-//                }
-//            }
-//        }
-//
-//    }
     
     #endif
     // swiftlint:disable function_parameter_count
