@@ -27,6 +27,7 @@ public extension Reactive where Base: MoyaProviderType {
 internal extension MoyaProviderType {
     
 
+    #if !USE_CACHE
     internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
         return Single.create { [weak self] single in
             let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
@@ -43,6 +44,44 @@ internal extension MoyaProviderType {
             }
         }
     }
+    #else
+    internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
+        let source = Observable<Response>.create { [weak self] observer in
+            let key = token.cacheKey
+            var returnCache = false
+            if let response = storage[key] {
+                returnCache = true
+                observer.onNext(response.response)
+            }
+            let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
+                switch result {
+                case let .success(response):
+                    if let token = token as? Cacheable {
+                        switch token.cache {
+                        case .never:
+                            storage.setObject(ResponseSink(response), forKey: key, expires: .never)
+                        case .disk(let seconds):
+                            storage.setObject(ResponseSink(response), forKey: key, expires: .seconds(TimeInterval(seconds)))
+                        default: break
+                        }
+                    }
+                    if !returnCache {
+                        observer.onNext(response)
+                    }
+                    observer.onCompleted()
+                case let .failure(error):
+                    observer.onError(error)
+                }
+            }
+
+            return Disposables.create {
+                cancellableToken?.cancel()
+            }
+        }
+        return source.asSingle()
+    }
+    #endif
+    
 
     internal func rxRequestWithProgress(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Observable<ProgressResponse> {
         let progressBlock: (AnyObserver) -> (ProgressResponse) -> Void = { observer in

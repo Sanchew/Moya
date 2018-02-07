@@ -1,8 +1,6 @@
 import Foundation
 import Result
-#if USE_CACHE
-    import AwesomeCache
-#endif
+
 
 /// Closure to be executed when a request has completed.
 public typealias Completion = (_ result: Result<Moya.Response, MoyaError>) -> Void
@@ -109,7 +107,6 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
     }
 
     
-    #if !USE_CACHE
     /// Designated request-making method. Returns a `Cancellable` token to cancel the request later.
     @discardableResult
     open func request(_ target: Target,
@@ -120,40 +117,7 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
         let callbackQueue = callbackQueue ?? self.callbackQueue
         return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: completion)
     }
-    #else
-    @discardableResult
-    open func request(_ target: Target,
-                      callbackQueue: DispatchQueue? = .none,
-                      progress: ProgressBlock? = .none,
-                      completion: @escaping Completion) -> Cancellable {
-        let cache: Cache<ResponseSink> = try! Cache<ResponseSink>(name: "moyaCache")
-
-        let key = target.cacheKey
-
-        if let response = cache[key] {
-            completion(.init(value: response.response))
-            return CancellableWrapper()
-        }else {
-            let callbackQueue = callbackQueue ?? self.callbackQueue
-            return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: { result in
-                if case let .success(response) = result, let target = target as? Cacheable {
-                    switch target.cache {
-                    case .never:
-                        break
-                    case .memory:
-                        cache.setObject(ResponseSink(response), forKey: key, expires: .seconds(600))
-                    case .disk(let seconed):
-                        cache.setObject(ResponseSink(response), forKey: key, expires: .seconds(TimeInterval(seconed)))
-                    case .forever:
-                        cache.setObject(ResponseSink(response), forKey: key, expires: .never)
-                    }
-                }
-                completion(result)
-            })
-        }
-    }
     
-    #endif
     // swiftlint:disable function_parameter_count
     /// When overriding this method, take care to `notifyPluginsOfImpendingStub` and to perform the stub using the `createStubFunction` method.
     /// Note: this was previously in an extension, however it must be in the original class declaration to allow subclasses to override.
