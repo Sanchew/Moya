@@ -14,14 +14,20 @@ extension Cacheable where Self: TargetType {
         let endpoint = MoyaProvider.defaultEndpointMapping(for: self)
         let request = try! endpoint.urlRequest()
         let origin = NSKeyedArchiver.archivedData(withRootObject: request).base64EncodedString()
-        return origin
+//        origin.reduce(0, { $0 * 31 + $1.hashValue })
+//        print(" \(origin.hashValue) \(request) \(origin)")
+//        var key = request.url!.absoluteString
+//        if let data = request.httpBody {
+//            key = key + data.base64EncodedString()
+//        }
+        return "\(origin.reduce(0, { $0 &* 31 &+ UnicodeScalar("\($1)")!.value }))"
     }
     
 }
 
 extension TargetType {
     
-    var cache: Cacheable? {
+    var cacheable: Cacheable? {
         return self as? Cacheable
     }
     

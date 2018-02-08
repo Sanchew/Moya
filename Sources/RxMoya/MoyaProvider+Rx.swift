@@ -52,22 +52,22 @@ internal extension MoyaProviderType {
     #else
     internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Observable<Response> {
         return Observable<Response>.create { [weak self] observer in
-//            if let cache = token.cache {
-//                print("cache in mem: \(storage.isOnMemory(forKey: cache.cacheKey)) \(cache.cacheKey.hashValue) \(try! MoyaProvider.defaultEndpointMapping(for: token).urlRequest())")
-                if let cache = token.cache, let response = storage[cache.cacheKey] {
-                    print("after cache in mem: \(storage.isOnMemory(forKey: cache.cacheKey)) \(try! MoyaProvider.defaultEndpointMapping(for: token).urlRequest())")
+            if let cache = token.cacheable {
+                print("1 cache in mem: \(storage.isOnMemory(forKey: cache.cacheKey)) \(cache.cacheKey) \(try! MoyaProvider.defaultEndpointMapping(for: token).urlRequest())")
+                if let response = storage[cache.cacheKey] {
+                    print("2 cache in mem: \(storage.isOnMemory(forKey: cache.cacheKey)) \(cache.cacheKey) \(try! MoyaProvider.defaultEndpointMapping(for: token).urlRequest())")
                     observer.onNext(response.response)
                     observer.onCompleted()
                     return Disposables.create {
 
                     }
                 }
-//            }
+            }
             let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
                 switch result {
                 case let .success(response):
                     observer.onNext(response)
-                    token.cache?.save(response)
+                    token.cacheable?.save(response)
                     observer.onCompleted()
                 case let .failure(error):
                     observer.onError(error)
