@@ -106,7 +106,6 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
     }
 
     
-    #if !USE_CACHE
     /// Designated request-making method. Returns a `Cancellable` token to cancel the request later.
     @discardableResult
     open func request(_ target: Target,
@@ -117,41 +116,7 @@ open class MoyaProvider<Target: TargetType>: MoyaProviderType {
         let callbackQueue = callbackQueue ?? self.callbackQueue
         return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: completion)
     }
-    #else
-    @discardableResult
-    open func request(_ target: Target,
-                      callbackQueue: DispatchQueue? = .none,
-                      progress: ProgressBlock? = .none,
-                      completion: @escaping Completion) -> Cancellable {
-        let key = target.cacheKey
-        if let response = try? storage.object(ofType: ResponseSink.self, forKey: key) {
-            completion(.init(value: response.response))
-            return CancellableWrapper()
-        }else {
-            let callbackQueue = callbackQueue ?? self.callbackQueue
-            return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: { result in
-                if case let .success(response) = result, let target = target as? Cacheable {
-                    switch target.cache {
-                    case .never:
-                        break
-                    case .memory:
-//                        cache.setObject(ResponseSink(response), forKey: key, expires: .seconds(600))
-//                        storage.setObject(ResponseSink(response), forKey: key, expiry: .never)
-                        break
-                    case .disk(let seconed):
-                        try? storage.setObject(ResponseSink(response), forKey: key, expiry: .seconds(TimeInterval(seconed)))
-                    case .forever:
-                        try? storage.setObject(ResponseSink(response), forKey: key, expiry: .never)
-                    }
-                }
-                completion(result)
-            })
-        }
-        let callbackQueue = callbackQueue ?? self.callbackQueue
-        return requestNormal(target, callbackQueue: callbackQueue, progress: progress, completion: completion)
-    }
     
-    #endif
     // swiftlint:disable function_parameter_count
     /// When overriding this method, take care to `notifyPluginsOfImpendingStub` and to perform the stub using the `createStubFunction` method.
     /// Note: this was previously in an extension, however it must be in the original class declaration to allow subclasses to override.

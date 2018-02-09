@@ -10,7 +10,15 @@ import Foundation
 public enum CacheType {
     public static let `default`: CacheType = .never
     case never
-    case memory
-    case disk(seconed: Int)
+    case disk(seconds: Int)
     case forever
+}
+
+public enum CacheFlushType {
+    // never fluah
+    case never
+    // flush by not in memory
+    case notInMemory
+    // 
+    case all
 }

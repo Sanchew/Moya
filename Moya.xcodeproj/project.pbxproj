@@ -82,12 +82,12 @@
 		D00AA2514CD6B1276B845BA7 /* ReactiveMoya.h in Headers */ = {isa = PBXBuildFile; fileRef = 019BF5A88BB928EBDFD944FE /* ReactiveMoya.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D6A04B657A83CA2FF80ABCF4 /* Moya.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 559D567FD0DA37D6CC98FF92 /* Moya.framework */; };
 		DA5049A820297C3700844AAC /* Cacheable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A720297C3600844AAC /* Cacheable.swift */; };
-		DA5049AA20297CB200844AAC /* TargetType+CacheKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A920297CB200844AAC /* TargetType+CacheKey.swift */; };
+		DA5049AA20297CB200844AAC /* TargetType+Cacheable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A920297CB200844AAC /* TargetType+Cacheable.swift */; };
 		DA5049AC20298C2300844AAC /* ResponseSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049AB20298C2300844AAC /* ResponseSink.swift */; };
 		DA5049AE20298E1200844AAC /* Stroage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049AD20298E1200844AAC /* Stroage.swift */; };
 		DA5049AF2029912500844AAC /* ResponseSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049AB20298C2300844AAC /* ResponseSink.swift */; };
 		DA5049B02029912500844AAC /* Cacheable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A720297C3600844AAC /* Cacheable.swift */; };
-		DA5049B12029912500844AAC /* TargetType+CacheKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A920297CB200844AAC /* TargetType+CacheKey.swift */; };
+		DA5049B12029912500844AAC /* TargetType+Cacheable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049A920297CB200844AAC /* TargetType+Cacheable.swift */; };
 		DA5049B22029912500844AAC /* Stroage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5049AD20298E1200844AAC /* Stroage.swift */; };
 		DA5049B32029915000844AAC /* MoyaCache.h in Headers */ = {isa = PBXBuildFile; fileRef = DA9A6DB920280B18005411F3 /* MoyaCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA631A5B37F36DA17E135F14 /* SignalProducer+MoyaSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFAFEA29CDFABC559F0BE2 /* SignalProducer+MoyaSpec.swift */; };
@@ -221,7 +221,7 @@
 		D38525FE207BE148B17084F3 /* Moya.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Moya.h; sourceTree = "<group>"; };
 		D48555FB39336D99F8365F5E /* MoyaProvider+Rx.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "MoyaProvider+Rx.swift"; sourceTree = "<group>"; };
 		DA5049A720297C3600844AAC /* Cacheable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cacheable.swift; sourceTree = "<group>"; };
-		DA5049A920297CB200844AAC /* TargetType+CacheKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetType+CacheKey.swift"; sourceTree = "<group>"; };
+		DA5049A920297CB200844AAC /* TargetType+Cacheable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TargetType+Cacheable.swift"; sourceTree = "<group>"; };
 		DA5049AB20298C2300844AAC /* ResponseSink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseSink.swift; sourceTree = "<group>"; };
 		DA5049AD20298E1200844AAC /* Stroage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stroage.swift; sourceTree = "<group>"; };
 		DA9A6DA02027EF8C005411F3 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
@@ -476,7 +476,7 @@
 				DA5049AB20298C2300844AAC /* ResponseSink.swift */,
 				DA5049A720297C3600844AAC /* Cacheable.swift */,
 				DA9A6DA02027EF8C005411F3 /* Cache.swift */,
-				DA5049A920297CB200844AAC /* TargetType+CacheKey.swift */,
+				DA5049A920297CB200844AAC /* TargetType+Cacheable.swift */,
 				DA5049AD20298E1200844AAC /* Stroage.swift */,
 			);
 			path = Cache;
@@ -928,7 +928,7 @@
 				61633F6E85FB39A4707A6167 /* MultipartFormData.swift in Sources */,
 				5054F87AFF61EAC0097F88BD /* MultiTarget.swift in Sources */,
 				BEAA605B30BE7651BA5C61A4 /* Plugin.swift in Sources */,
-				DA5049AA20297CB200844AAC /* TargetType+CacheKey.swift in Sources */,
+				DA5049AA20297CB200844AAC /* TargetType+Cacheable.swift in Sources */,
 				83B0E400A7562256224CB7FF /* AccessTokenPlugin.swift in Sources */,
 				B5A7124CF285D8EC7F89C1AD /* CredentialsPlugin.swift in Sources */,
 				1446FBB31F214C5200C1EFF2 /* URL+Moya.swift in Sources */,
@@ -1015,7 +1015,7 @@
 			files = (
 				DA5049AF2029912500844AAC /* ResponseSink.swift in Sources */,
 				DA5049B02029912500844AAC /* Cacheable.swift in Sources */,
-				DA5049B12029912500844AAC /* TargetType+CacheKey.swift in Sources */,
+				DA5049B12029912500844AAC /* TargetType+Cacheable.swift in Sources */,
 				DA5049B22029912500844AAC /* Stroage.swift in Sources */,
 				DA9A6DB620280AE4005411F3 /* Cache.swift in Sources */,
 			);
