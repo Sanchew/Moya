@@ -13,8 +13,11 @@ public protocol Cacheable {
     var cache: CacheType { get }
     var cacheKey: String { get }
     var flushType: CacheFlushType { get }
+    var flush: Bool { get }
+    var enable: Bool { get }
     
 }
+
 
 extension Cacheable {
     
@@ -29,7 +32,7 @@ extension Cacheable {
         }
     }
     
-    var flush: Bool {
+    public var flush: Bool {
         switch self.flushType {
         case .all:
             return true
@@ -41,4 +44,9 @@ extension Cacheable {
         }
     }
     
+    public var enable: Bool {
+        return true
+    }
+    
 }
+

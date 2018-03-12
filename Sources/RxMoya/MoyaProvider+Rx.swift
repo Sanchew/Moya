@@ -53,7 +53,7 @@ internal extension MoyaProviderType {
     #else
     internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Observable<Response> {
         return Observable<Response>.create { [weak self] observer in
-            if let cache = token.cacheable {
+            if let cache = token.cacheable, cache.enable {
                 let cacheKey = cache.cacheKey
                 let flush = cache.flush
                 if let entry = try? storage.entry(ofType: ResponseSink.self, forKey: cacheKey) {

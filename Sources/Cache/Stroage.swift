@@ -10,5 +10,9 @@ import Cache
 
 let diskConfig = DiskConfig(name: "moyaCache")
 
-internal let storage = try! Storage(diskConfig: diskConfig, memoryConfig: MemoryConfig(expiry: .never, countLimit: 50, totalCostLimit: 50))
+internal let storage = try! Cache.Storage(diskConfig: diskConfig, memoryConfig: MemoryConfig(expiry: .never, countLimit: 50, totalCostLimit: 50))
+
+public struct Storage {
+    public static let `default` = storage
+}
 

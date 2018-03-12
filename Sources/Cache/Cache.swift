@@ -22,3 +22,18 @@ public enum CacheFlushType {
     // 
     case all
 }
+
+extension CacheType: Equatable {
+    public static func ==(lhs: CacheType, rhs: CacheType) -> Bool {
+        switch (lhs, rhs) {
+        case (.never, .never):
+            return true
+        case (.forever, .forever):
+            return true
+        default:
+            return false
+        }
+    }
+    
+    
+}
