@@ -3,6 +3,10 @@ import RxSwift
 #if !COCOAPODS
     import Moya
 #endif
+#if AUTO_RECONNECT
+    import Reachability
+    import RxReachability
+#endif
 
 extension MoyaProvider: ReactiveCompatible {}
 
@@ -35,7 +39,7 @@ internal extension MoyaProviderType {
     
     #if !USE_CACHE
     internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Single<Response> {
-        return Single.create { [weak self] single in
+        var single = Single.create { [weak self] single in
             let cancellableToken = self?.request(token, callbackQueue: callbackQueue, progress: nil) { result in
                 switch result {
                 case let .success(response):
@@ -49,10 +53,16 @@ internal extension MoyaProviderType {
                 cancellableToken?.cancel()
             }
         }
+        #if AUTO_RECONNECT
+            obs = obs.retryWhen({ (_) in
+                return Reachability.rx.isConnected
+            })
+        #endif
+        return single
     }
     #else
     internal func rxRequest(_ token: Target, callbackQueue: DispatchQueue? = nil) -> Observable<Response> {
-        return Observable<Response>.create { [weak self] observer in
+        var obs = Observable<Response>.create { [weak self] observer in
             if let cache = token.cacheable, cache.enable {
                 let cacheKey = cache.cacheKey
                 let flush = cache.flush
@@ -81,6 +91,12 @@ internal extension MoyaProviderType {
                 cancellableToken?.cancel()
             }
         }
+        #if AUTO_RECONNECT
+            obs = obs.retryWhen({ (_) in
+                return Reachability.rx.isConnected
+            })
+        #endif
+        return obs
     }
     #endif
     

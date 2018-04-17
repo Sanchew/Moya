@@ -50,4 +50,15 @@ Pod::Spec.new do |s|
     }
   end
 
+  s.subspec "AutoReconnect" do |ss|
+    ss.dependency "Moya/Core"
+    ss.dependency "RxSwift", "~> 4.0"
+    ss.dependency "Cache"
+    ss.dependency "RxReachability"
+    ss.pod_target_xcconfig = {
+      'OTHER_SWIFT_FLAGS' => '-D AUTO_RECONNECT',
+      'GCC_PREPROCESSOR_DEFINTTIONS' => 'AUTO_RECONNECT=1'
+    }
+  end
+
 end
