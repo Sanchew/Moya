@@ -10,7 +10,7 @@ import Foundation
 
 extension Cacheable where Self: TargetType {
     
-    public var cacheKey: String {
+    public var _cacheKey: String {
         let endpoint = MoyaProvider.defaultEndpointMapping(for: self)
         let request = try! endpoint.urlRequest()
         let origin = NSKeyedArchiver.archivedData(withRootObject: request).base64EncodedString()
@@ -22,6 +22,10 @@ extension Cacheable where Self: TargetType {
         //        }
 //        return "\(origin.reduce(0, { $0 &* 31 &+ UnicodeScalar("\($1)")!.value }))"
         return origin
+    }
+    
+    public var cacheKey: String {
+        return _cacheKey
     }
     
     public var flushType: CacheFlushType {
