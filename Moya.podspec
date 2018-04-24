@@ -51,6 +51,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec "AutoReconnect" do |ss|
+    ss.source_files = "Sources/AutoReconnect/"
     ss.dependency "Moya/Core"
     ss.dependency "RxSwift", "~> 4.0"
     ss.dependency "Cache"
