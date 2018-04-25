@@ -55,8 +55,10 @@ internal extension MoyaProviderType {
         }
         #if AUTO_RECONNECT
             if let auto = token as? AutoReconnectable, auto.autoReconnect {
-                obs = obs.retryWhen({ (_) in
-                    return Observable.merge(Reachability.rx.isConnected, Observable<Int>.interval(auto.interval, scheduler: CurrentThreadScheduler).map{ _ in () })
+                obs = obs.retryWhen({ (errorObs) -> Observable<Void> in
+                    return errorObs.flatMapLatest{ error -> Observable<Void> in
+                        return Observable.merge(Reachability.rx.isConnected, Observable<Int>.interval(RxTimeInterval(auto.interval), scheduler: MainScheduler.asyncInstance).map{ _ in () })
+                    }
                 })
             }
         #endif
@@ -94,10 +96,13 @@ internal extension MoyaProviderType {
             }
         }
     
+        
         #if AUTO_RECONNECT
         if let auto = token as? AutoReconnectable, auto.autoReconnect {
-            obs = obs.retryWhen({ (_) -> Observable<Void> in
-                return Observable.merge(Reachability.rx.isConnected, Observable<Int>.interval(RxTimeInterval(auto.interval), scheduler: MainScheduler.asyncInstance).map{ _ in () })
+            obs = obs.retryWhen({ (errorObs) -> Observable<Void> in
+                return errorObs.flatMapLatest{ error -> Observable<Void> in
+                    return Observable.merge(Reachability.rx.isConnected, Observable<Int>.interval(RxTimeInterval(auto.interval), scheduler: MainScheduler.asyncInstance).map{ _ in () })
+                }
             })
         }
         #endif
