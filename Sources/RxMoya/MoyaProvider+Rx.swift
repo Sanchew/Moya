@@ -72,7 +72,7 @@ internal extension MoyaProviderType {
                 let flush = cache.flush
                 if let entry = try? storage.entry(ofType: ResponseSink.self, forKey: cacheKey) {
                     observer.onNext(entry.object.response)
-                    if !flush {
+                    if !flush && !entry.expiry.isExpired {
                         observer.onCompleted()
                         return Disposables.create {
     
